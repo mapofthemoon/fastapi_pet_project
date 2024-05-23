@@ -1,0 +1,8 @@
+{
+    "python.analysis.extraPaths": [
+        "./application/backgroundtasks",
+        "./application/cache/test_",
+        "./application/cache/test_",
+        "./application/db_app"
+    ]
+}
