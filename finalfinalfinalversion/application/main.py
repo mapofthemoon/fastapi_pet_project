@@ -6,7 +6,7 @@ from application.db_app.database import engine
 from application.routers import dish_routers, menu_routers, submenu_routers
 from fastapi import FastAPI
 
-from application.backgroundtasks.tasks import book_table, result_backend
+from application.backgroundtasks.tasks import ReservationDetails, send_reservation_confirmation
 from dramatiq.results.errors import ResultMissing
 from fastapi import Query
 from fastapi.responses import HTMLResponse
@@ -37,15 +37,9 @@ async def read_item(request: Request, id: str):
     )
 
 
-@app.get("/book_table", tags=["dramatiq"])
-def result_email(email_receiver: str = Query(..., title="Email Receiver", description="Enter the email address to send the booking confirmation")):
-    try:
-        task = book_table.send(email_receiver)  
-        return result_backend.get_result(task)
-    except ResultMissing:
-        return "Waiting for all requests"
-    except Exception as e:
-        return f"An error occurred: {str(e)}"
-
+@app.post("/send_reservation_confirmation/")
+async def send_reservation(email_receiver: str, reservation_details: ReservationDetails):
+    send_reservation_confirmation.send(email_receiver, reservation_details)
+    return {"message": "Reservation confirmation email will be sent shortly."}
 
 
